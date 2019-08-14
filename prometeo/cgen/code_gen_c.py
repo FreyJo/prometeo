@@ -37,7 +37,7 @@ prmt_temp_functions = {\
         "pvec_fill": "c_pmt_pvec_fill", \
         "pvec_copy": "c_pmt_pvec_copy", \
         "pvec_print": "c_pmt_pvec_print", \
-        "prmt_lus" : "c_pmt_lus"}
+        "pmt_lus" : "c_pmt_lus"}
 
 prmt_temp_types = {\
         "pmat": "struct pmat *", \

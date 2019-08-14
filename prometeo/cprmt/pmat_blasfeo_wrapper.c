@@ -29,6 +29,36 @@ struct pmat * c_pmt_create_pmat(int m, int n) {
 	return (struct pmat *)(pmat_address);
 }
 
+int * c_pmt_create_i_zeros(int m, int n) {	
+    // assign current address of global heap to pmat pointer
+    struct pmat *pmat = (struct pmat *) ___c_prmt_8_heap;
+    void *pmat_address = ___c_prmt_8_heap;
+    
+    // advance global heap address
+    ___c_prmt_8_heap += sizeof(struct pmat);
+    
+    
+    // create (zeroed) blasfeo_dmat and advance global heap
+    c_pmt_assign_and_advance_blasfeo_dmat(m, n, &(pmat->bmat));
+
+	return (struct pmat *)(pmat_address);
+}
+
+double * c_pmt_create_d_zeros(int m, int n) {	
+    // assign current address of global heap to pmat pointer
+    struct pmat *pmat = (struct pmat *) ___c_prmt_8_heap;
+    void *pmat_address = ___c_prmt_8_heap;
+    
+    // advance global heap address
+    ___c_prmt_8_heap += sizeof(struct pmat);
+    
+    
+    // create (zeroed) blasfeo_dmat and advance global heap
+    c_pmt_assign_and_advance_blasfeo_dmat(m, n, &(pmat->bmat));
+
+	return (struct pmat *)(pmat_address);
+}
+
 void c_pmt_assign_and_advance_blasfeo_dmat(int m, int n, struct blasfeo_dmat **bmat) {
     // assign current address of global heap to blasfeo dmat pointer
     assert((size_t) ___c_prmt_8_heap % 8 == 0 && "pointer not 8-byte aligned!");
@@ -80,29 +110,30 @@ void c_pmt_dgemm(struct pmat *A, struct pmat *B, struct pmat *C, struct pmat *D)
     blasfeo_dgemm_nn(mA, nA, nB, 1.0, bA, 0, 0, bB, 0, 0, 1, bC, 0, 0, bD, 0, 0);
 }
 
-// void c_pmt_lus(struct pmat *A, struct pmat *B, struct pmat *C) {
-//     int mA = A->bmat->m; 
-//     int nA = A->bmat->n; 
-//     int nB = B->bmat->n; 
-//     struct blasfeo_dmat *bA = A->bmat;
-//     struct blasfeo_dmat *bB = B->bmat;
-//     struct blasfeo_dmat *bC = C->bmat;
+void c_pmt_lus(struct pmat *A, struct pmat *B, struct pmat *C) {
+    int mA = A->bmat->m; 
+    int nA = A->bmat->n; 
+    int nB = B->bmat->n; 
+    struct blasfeo_dmat *bA = A->bmat;
+    struct blasfeo_dmat *bB = B->bmat;
+    struct blasfeo_dmat *bC = C->bmat;
 
-//     // printf("In dgemm\n");
-//     // blasfeo_print_dmat(mA, nA, A->bmat, 0, 0);
-//     // blasfeo_print_dmat(mA, nA, B->bmat, 0, 0);
-//     // blasfeo_print_dmat(mA, nA, C->bmat, 0, 0);
-//     // blasfeo_print_dmat(mA, nA, D->bmat, 0, 0);
+    // printf("In dgemm\n");
+    // blasfeo_print_dmat(mA, nA, A->bmat, 0, 0);
+    // blasfeo_print_dmat(mA, nA, B->bmat, 0, 0);
+    // blasfeo_print_dmat(mA, nA, C->bmat, 0, 0);
+    // blasfeo_print_dmat(mA, nA, D->bmat, 0, 0);
 
-//     // allocate memory for pivots
-//     // factorization
-//     blasfeo_dgetrf_rp(m, n, dG_dK_ss, 0, 0, dG_dK_ss, 0, 0, ipiv);
-//     // permute the r.h.s
-//     blasfeo_dvecpe(nK, ipiv_ss, rG, 0);
-//     // triangular solves 
-//     blasfeo_dtrsv_lnu(nK, dG_dK_ss, 0, 0, rG, 0, rG, 0);
-//     blasfeo_dtrsv_unn(nK, dG_dK_ss, 0, 0, rG, 0, rG, 0);
-// }
+    // create factor
+    struct pmat * B = c_pmt_create_pmat(n, n);
+    // factorization
+    blasfeo_dgetrf_rp(m, n, dG_dK_ss, 0, 0, dG_dK_ss, 0, 0, ipiv);
+    // permute the r.h.s
+    blasfeo_dvecpe(nK, ipiv_ss, rG, 0);
+    // triangular solves 
+    blasfeo_dtrsv_lnu(nK, dG_dK_ss, 0, 0, rG, 0, rG, 0);
+    blasfeo_dtrsv_unn(nK, dG_dK_ss, 0, 0, rG, 0, rG, 0);
+}
 
 void c_pmt_dgead(double alpha, struct pmat *A, struct pmat *B) {
     int mA = A->bmat->m; 

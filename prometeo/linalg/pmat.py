@@ -117,7 +117,7 @@ def pmat_copy(A: pmat, B: pmat):
             B[i][j] = A[i][j]
     return
 
-def prmt_lus(A: pmat, B: pmat, opts):
+def pmt_lus(A: pmat, B: pmat, opts):
     res  = pmat(A.blasfeo_dmat.m, B.blasfeo_dmat.n)
     fact = pmat(A.blasfeo_dmat.m, B.blasfeo_dmat.m)
     # create pmat for factor
